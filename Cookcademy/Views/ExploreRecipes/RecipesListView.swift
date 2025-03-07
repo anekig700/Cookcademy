@@ -10,7 +10,7 @@ import SwiftUI
 struct RecipesListView: View {
     
     @EnvironmentObject private var recipeData: RecipeData
-    let category: MainInformation.Category
+    let viewStyle: ViewStyle
     
     @State private var isPresenting = false
     @State private var newRecipe = Recipe()
@@ -31,6 +31,8 @@ struct RecipesListView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: {
+                        newRecipe = Recipe()
+                        newRecipe.mainInformation.category = recipes.first?.mainInformation.category ?? .breakfast
                         isPresenting = true
                     }, label: {
                         Image(systemName: "plus")
@@ -49,6 +51,9 @@ struct RecipesListView: View {
                             ToolbarItem(placement: .confirmationAction, content: {
                                 if newRecipe.isValid {
                                     Button("Add", action: {
+                                        if case .favorites = viewStyle {
+                                            newRecipe.isFavorite = true
+                                        }
                                         recipeData.add(newRecipe)
                                         isPresenting = false
                                     })
@@ -64,12 +69,27 @@ struct RecipesListView: View {
 
 extension RecipesListView {
     
+    enum ViewStyle {
+        case favorites
+        case singleCategory(MainInformation.Category)
+    }
+    
     private var recipes: [Recipe] {
-        recipeData.recipes(for: category)
+        switch viewStyle {
+        case .favorites:
+            return recipeData.favoriteRecipes
+        case .singleCategory(let category):
+            return recipeData.recipes(for: category)
+        }
       }
     
     private var navigationTitle: String {
-        "\(category.rawValue) Recipes"
+        switch viewStyle {
+        case .favorites:
+            return "Favorite Recipes"
+        case .singleCategory(let category):
+            return "\(category.rawValue) Recipes"
+        }
     }
     
     func binding(for recipe: Recipe) -> Binding<Recipe> {
@@ -82,7 +102,7 @@ extension RecipesListView {
 
 #Preview {
     NavigationView {
-        RecipesListView(category: .breakfast)
+        RecipesListView(viewStyle: .singleCategory(.breakfast))
             .environmentObject(RecipeData())
     }
 }
