@@ -47,11 +47,28 @@ struct ModifyComponentsView<Component: RecipeComponent, DestinationView: ModifyC
                 NavigationLink("Add the first \(Component.singularName())", destination: addComponentView)
                 Spacer()
             } else {
+                HStack {
+                    Text(Component.pluralName().capitalized)
+                        .font(.title)
+                        .padding()
+                    Spacer()
+                    EditButton()
+                        .padding()
+                }
                 List {
                     ForEach(components.indices, id: \.self) { index in
                         let component = components[index]
-                        Text(component.description)
-                    }.listRowBackground(listBackgroundColor)
+                        let editComponentView = DestinationView(component: $components[index]) { _ in return
+                        }
+                        .navigationTitle("Edit " + "\(Component.singularName().capitalized)")
+                        NavigationLink(component.description, destination: editComponentView)
+                    }
+                    .onDelete{ components.remove(atOffsets: $0) }
+                    .onMove {
+                        indices, newOffset in
+                        components.move(fromOffsets: indices, toOffset: newOffset)
+                    }
+                    .listRowBackground(listBackgroundColor)
                     NavigationLink("Add another \(Component.singularName())", destination: addComponentView)
                         .buttonStyle(PlainButtonStyle())
                         .listRowBackground(listBackgroundColor)
