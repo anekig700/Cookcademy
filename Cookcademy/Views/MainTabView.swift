@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MainTabView: View {
     
-    @StateObject var recipeData = RecipeData()
+    @StateObject private var recipeData = RecipeData()
     
     var body: some View {
         TabView {
@@ -17,9 +17,12 @@ struct MainTabView: View {
                 RecipeCategoryGridView()
             }
             Tab("Favorites", systemImage: "heart.fill") {
-                NavigationStack {
+                NavigationView {
                     RecipesListView(viewStyle: .favorites)
                 }
+            }
+            Tab("Settings", systemImage: "gear") {
+                SettingsView()
             }
         }
         .environmentObject(recipeData)
