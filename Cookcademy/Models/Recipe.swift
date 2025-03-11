@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Recipe: Identifiable {
+struct Recipe: Identifiable, Codable {
     var id = UUID()
     
     var mainInformation: MainInformation
@@ -36,7 +36,7 @@ struct Recipe: Identifiable {
     }
 }
 
-struct MainInformation {
+struct MainInformation: Codable {
     var name: String
     var description: String
     var author: String
@@ -46,7 +46,7 @@ struct MainInformation {
         !name.isEmpty && !description.isEmpty && !author.isEmpty
     }
     
-    enum Category: String, CaseIterable {
+    enum Category: String, CaseIterable, Codable {
         case breakfast = "Breakfast"
         case lunch = "Lunch"
         case dinner = "Dinner"
@@ -84,7 +84,7 @@ struct Ingredient: RecipeComponent {
         self.init(name: "", quantity: 1.0, unit: .none)
     }
     
-    enum Unit: String, CaseIterable {
+    enum Unit: String, CaseIterable, Codable {
         case oz = "Ounces"
         case g = "Grams"
         case cups = "Cups"

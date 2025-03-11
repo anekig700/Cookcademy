@@ -16,6 +16,7 @@ struct RecipeDetailView: View {
     @AppStorage("listTextColor") private var listTextColor = AppColor.foreground
     
     @State private var isPresenting = false
+    @EnvironmentObject private var recipeData: RecipeData
     
     var body: some View {
         VStack {
@@ -75,7 +76,7 @@ struct RecipeDetailView: View {
             }
         }
         .sheet(isPresented: $isPresenting) {
-            NavigationStack {
+            NavigationView {
                 ModifyRecipeView(recipe: $recipe)
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
@@ -85,6 +86,9 @@ struct RecipeDetailView: View {
                         }
                     }
                     .navigationTitle("Edit Recipe")
+            }
+            .onDisappear {
+                recipeData.saveRecipes()
             }
         }
     }
